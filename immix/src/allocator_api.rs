@@ -1,7 +1,21 @@
+use std::ptr::NonNull;
+
 use super::enums::{AllocError, SizeClass, Mark};
 use super::rawptr::RawPtr;
+use super::typedefs::*;
 pub trait AllocRaw {
-    fn alloc<T>(&self, object: T) -> Result<RawPtr<T>, AllocError>;
+    type Header: AllocHeader;
+    fn alloc<T>(&self, object: T) -> Result<RawPtr<T>, AllocError>
+    where 
+        T: AllocObject<<Self::Header as AllocHeader>::TypeId>;
+
+    fn alloc_array<T>(&self, size_bytes: ArraySize) -> Result<RawPtr<u8>, AllocError>;
+
+    // Point is that the GC won't know types, so we'll have to do this.
+    fn get_header(object: NonNull<()>) -> NonNull<Self::Header>;
+
+    // Get object from header.
+    fn get_object(header: NonNull<Self::Header>) -> NonNull<()>;
 }
 
 /// As long as it can be copied and cloned, we allow it as an identifier.
@@ -11,8 +25,6 @@ pub trait AllocObject<T: AllocTypeId> {
     const TYPE_ID: T;
 }
 
-type ArraySize = u32;
-type ObjectSize = u32;
 
 /// The header trait that the interpreter shall use.
 pub trait AllocHeader: Sized {

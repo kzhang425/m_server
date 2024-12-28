@@ -7,3 +7,4 @@ pub mod heap;
 pub mod misc;
 pub mod allocator_api;
 pub mod rawptr;
+pub mod typedefs;
