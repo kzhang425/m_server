@@ -4,9 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-parser_lib = {path = "./parser_lib"}
 
 [workspace]
-members = [ "allocator", "immix",
-    "parser_lib"
+members = [ "allocator", "immix"
 ]
